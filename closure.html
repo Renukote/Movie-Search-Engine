@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body div:nth-child(1) {
+            display: flex;
+        }
+        body div:nth-child(1) > div {
+            flex-direction: column;
+        }
+
+        input {
+            width: 200px;
+        }
+        #movies {
+            height: 200px;
+            width: 206px;
+            border: 1px solid blue;
+            overflow: scroll;
+            border-top: none;
+        }
+        #container > div {
+            width:500px;
+            border:1px solid black;
+            display: inline-block;
+            flex-grow: 1;
+            position: fixed;
+            top: 50px;
+            left:400px;
+        }
+        #container img {
+            width: 500px;
+            height:350px;
+        }
+        #container h3, #container h4, #container p {
+            margin:10px;
+            padding:0px;
+        }
+        
+    </style>
+</head>
+<body>
+    
+    <div>
+        <div>
+            <input oninput = 'debounce(main,1000)' type = 'text' id = 'movie' placeholder = 'Enter movie name' />
+            <div id = 'movies'> </div>
+        </div>
+        <div id = 'container'></div>
+    </div>
+
+</body>
+</html>
+
+<script>
+    let timerId;
+
+    // Search movies  -- done
+    async function searchMovies( movieName ) {
+        try { 
+            let res = await fetch(`http://www.omdbapi.com/?apikey=453161dd&tt1285016&s=${movieName}`)
+            var data = await res.json();
+        }
+        catch (error) {
+            console.log( error );
+        }
+
+        // console.log( data );
+        appendMovies( data.Search);
+        return data;
+    }
+    
+
+    // Movies suggestion Engine -- done
+    function appendMovies(movies) {
+        let container = document.getElementById('movies');
+        container.innerHTML  = "";
+
+        movies.forEach( function (movie) {
+            let p = document.createElement('p');
+            p.innerText = movie.Title;  
+            p.onclick = showDetails;
+            container.append(p);
+        })
+    }
+
+    async function showDetails(){
+        let container = document.getElementById("container");
+        container.innerHTML = "";
+        let movieName = event.target.textContent;
+
+        let res = await fetch(`http://www.omdbapi.com/?apikey=453161dd&tt1285016&t=${movieName}`);
+        let movieDetails = await res.json();
+
+        let div = document.createElement('div');
+
+        let img = document.createElement('img');
+        img.src = movieDetails.Poster;
+
+        let title = document.createElement('h3');
+        title.textContent = movieDetails.Title;
+
+        let rating = document.createElement('h4');
+        rating.textContent = 'Rating - ' + movieDetails.imdbRating;
+
+        let cast = document.createElement('p');
+        cast.innerText = 'Cast:  ' +  movieDetails.Actors;
+
+        div.append(img, title, rating, cast );
+        container.append( div );
+    }
+
+    // Main wrapper funtion -- done
+    async function main() {
+        let name = document.getElementById('movie').value;
+        if( name.length < 3 ) return false;
+
+        let res = await searchMovies(name);
+        appendMovies( res.Search );
+    }
+
+    // debouncing a.k.a throttling
+    function debounce(func, delay) {
+        if( timerId ) {
+            clearTimeout( timerId );
+        }
+
+        timerId = setTimeout(function() {
+            func();
+        },delay)
+    }
+
+</script>
