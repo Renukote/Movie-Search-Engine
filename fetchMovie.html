@@ -72,10 +72,17 @@
                 let year = document.createElement('h5');
                 year.textContent = 'Year - ' + item.Year;
 
-                let rating = document.createElement('h5');
-                rating.innerText = 'Rating - ' + await getRating(item);
+                let ratingDiv = document.createElement('div');
+                let rating = await getRating(item);
 
-                div.append( img, movieName, year, rating );
+                if( rating > 8.5 ) ratingDiv.innerHTML = `<div style = 'display: flex'>
+                                                            <div style = 'border:1px solid black; padding:3px; height:10px; border-radius:3px; font-size:10px'>Recommended</div>
+                                                            <div style = 'padding:0px 10px; font-weight: 700; font-size:14px'> Rating - ${rating} </div>
+                                                          </div>`
+
+                else ratingDiv.innerHTML = `<div style = 'font-size:14px; font-weight:700; padding:5px'>Rating - ${rating}</div>`;
+
+                div.append( img, movieName, year, ratingDiv );
                 container.append(div);
             });
 
