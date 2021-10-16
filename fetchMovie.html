@@ -29,6 +29,11 @@
             margin: 0px;
             padding: 0px;
         }
+        #no-results {
+            text-align:center;
+            width:1000px;
+            height:60px;
+        }
     </style>
 </head>
 <body>
@@ -62,8 +67,14 @@
             let name = document.getElementById('name');
             container.innerHTML = "";
 
-            // looping through each movie and creating a movie box with all details
-            data.forEach( async function( item ) {
+            if( data == undefined ) 
+            {
+                container.innerHTML = '<h1 id = "no-results">No results found</h1>';
+            }
+            else 
+            {
+                // looping through each movie and creating a movie box with all details
+                data.forEach( async function( item ) {
                 try {
                     let div = document.createElement('div');
                     div.class = 'card';
@@ -97,8 +108,8 @@
                     container.append(div);
                 }
                 catch ( error ) { console.log( 'error', error ); }
-            });
-
+                });
+            }
             
             // getting the movie by imdbID and returning its imdbRating
             async function getRating( id ) {
